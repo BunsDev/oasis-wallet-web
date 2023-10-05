@@ -30,6 +30,9 @@ export const AccountSelector = memo((props: Props) => {
 
   const accounts = Object.values(wallets).map(wallet => (
     <ManageableAccount
+      editHandler={(name: string) => {
+        dispatch(walletActions.setWalletName({ address: wallet.address, name }))
+      }}
       key={wallet.address}
       wallet={wallet}
       onClick={switchAccount}

@@ -89,11 +89,18 @@ const StyledDescriptionList = styled.dl`
 export interface AccountSummaryProps {
   address: string
   balance: BalanceDetails
+  editHandler: (name: string) => void
   walletHasAccounts?: boolean
   wallet?: Wallet
 }
 
-export function AccountSummary({ address, balance, wallet, walletHasAccounts }: AccountSummaryProps) {
+export function AccountSummary({
+  address,
+  balance,
+  editHandler,
+  wallet,
+  walletHasAccounts,
+}: AccountSummaryProps) {
   const { t } = useTranslation()
   const [layerVisibility, setLayerVisibility] = useState(false)
   const { dark } = useContext<any>(ThemeContext)
@@ -170,6 +177,7 @@ export function AccountSummary({ address, balance, wallet, walletHasAccounts }: 
         <ManageableAccountEditModal
           animation
           closeHandler={() => setLayerVisibility(false)}
+          editHandler={editHandler}
           wallet={wallet}
         />
       )}
