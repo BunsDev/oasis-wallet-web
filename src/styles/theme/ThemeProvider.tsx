@@ -160,6 +160,10 @@ const grommetCustomTheme: ThemeType = {
         dark: '#0E5265',
         light: '#00C8FF',
       },
+      'background-custom-2': {
+        dark: '#6FFFB0',
+        light: '#E8F5FF',
+      },
       'component-toolbar': {
         dark: '#0f346088',
         light: '#26a2f844',
@@ -172,7 +176,10 @@ const grommetCustomTheme: ThemeType = {
         dark: '#6FFFB0',
         light: '#3fa900',
       },
-
+      'text-custom': {
+        dark: '#16213E',
+        light: '#31435A',
+      },
       text: {
         dark: '#F8F8F8',
         light: '#16213E',
