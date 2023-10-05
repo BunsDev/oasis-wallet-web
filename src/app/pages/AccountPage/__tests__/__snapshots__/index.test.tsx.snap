@@ -685,44 +685,6 @@ exports[`<AccountPage  /> should match snapshot 1`] = `
   border: 0;
 }
 
-.c15 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-flex-direction: row;
-  -ms-flex-direction: row;
-  flex-direction: row;
-  -webkit-flex-wrap: wrap;
-  -ms-flex-wrap: wrap;
-  flex-wrap: wrap;
-  border-top: solid 1px #EDEDED;
-  margin: 6px 0 0;
-  padding: 12px 12px 6px;
-}
-
-.c15 dt,
-.c15 dd {
-  margin: 0;
-}
-
-.c15 dt:first-of-type,
-.c15 dd:first-of-type {
-  font-weight: bold;
-}
-
-.c18 {
-  padding: 12px;
-}
-
-.c18:hover {
-  background-color: #11111108;
-}
-
-.c18.active {
-  background-color: #EFEFEF;
-}
-
 .c32 {
   box-sizing: border-box;
   font-size: inherit;
@@ -770,6 +732,44 @@ exports[`<AccountPage  /> should match snapshot 1`] = `
 .c31 {
   position: relative;
   width: 100%;
+}
+
+.c15 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-flex-wrap: wrap;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  border-top: solid 1px #EDEDED;
+  margin: 6px 0 0;
+  padding: 12px 12px 6px;
+}
+
+.c15 dt,
+.c15 dd {
+  margin: 0;
+}
+
+.c15 dt:first-of-type,
+.c15 dd:first-of-type {
+  font-weight: bold;
+}
+
+.c18 {
+  padding: 12px;
+}
+
+.c18:hover {
+  background-color: #11111108;
+}
+
+.c18.active {
+  background-color: #EFEFEF;
 }
 
 @media only screen and (max-width:768px) {

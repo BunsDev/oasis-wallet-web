@@ -15,9 +15,11 @@ import { uintToBase64, hex2uint } from '../../../../lib/helpers'
 import { AddressBox } from '../../../AddressBox'
 
 export const ManageableAccountEditModal = ({
+  animation,
   closeHandler,
   wallet,
 }: {
+  animation?: boolean
   closeHandler: () => void
   wallet: Wallet
 }) => {
@@ -28,7 +30,7 @@ export const ManageableAccountEditModal = ({
     <ResponsiveLayer
       onClickOutside={closeHandler}
       onEsc={closeHandler}
-      animation="none"
+      animation={animation ? 'slide' : 'none'}
       background="background-front"
       modal
       position="top"
