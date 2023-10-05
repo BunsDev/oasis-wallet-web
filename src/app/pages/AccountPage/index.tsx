@@ -24,7 +24,6 @@ import styled from 'styled-components'
 import { normalizeColor } from 'grommet/es6/utils'
 
 import { accountActions } from 'app/state/account'
-import { walletActions } from 'app/state/wallet'
 import { selectAccount } from 'app/state/account/selectors'
 import { BalanceDetails } from 'app/state/account/types'
 import { selectActiveWallet, selectHasAccounts } from 'app/state/wallet/selectors'
@@ -94,12 +93,7 @@ export function AccountPage(props: AccountPageProps) {
         ? null
         : (BigInt(account.available) + balanceDelegations + balanceDebondingDelegations).toString(),
   }
-  const editWalletHandler = (name: string) => {
-    if (!wallet) {
-      return
-    }
-    dispatch(walletActions.setWalletName({ address: wallet.address, name }))
-  }
+
   // Restart fetching account balances if address or network changes
   useEffect(() => {
     dispatch(accountActions.openAccountPage(address))
@@ -139,7 +133,6 @@ export function AccountPage(props: AccountPageProps) {
           <AccountSummary
             address={address}
             balance={balance}
-            editHandler={editWalletHandler}
             wallet={wallet}
             walletHasAccounts={walletHasAccounts}
           />

@@ -9,7 +9,7 @@ export const ManageableAccount = ({
   isActive,
   onClick,
 }: {
-  editHandler: (name: string) => void
+  editHandler?: (name: string) => void
   wallet: Wallet
   isActive: boolean
   onClick: (address: string) => void

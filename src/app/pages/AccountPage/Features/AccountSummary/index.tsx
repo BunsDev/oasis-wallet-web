@@ -1,5 +1,5 @@
 import styled, { ThemeContext } from 'styled-components'
-import { EditableAddressBox, EditableNameBox } from 'app/components/AddressBox'
+import { AddressBox, EditableAddressBox, EditableNameBox } from 'app/components/AddressBox'
 import { AlertBox } from 'app/components/AlertBox'
 import { AmountFormatter } from 'app/components/AmountFormatter'
 import { AnchorLink } from 'app/components/AnchorLink'
@@ -9,10 +9,11 @@ import { ResponsiveContext } from 'grommet/es6/contexts/ResponsiveContext'
 import { QRCodeCanvas } from 'qrcode.react'
 import { useContext, useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
-
+import { useDispatch, useSelector } from 'react-redux'
+import { walletActions } from 'app/state/wallet'
 import { BalanceDetails } from 'app/state/account/types'
 import { selectTicker } from 'app/state/network/selectors'
+import { selectUnlockedStatus } from 'app/state/selectUnlockedStatus'
 import { ManageableAccountEditModal } from 'app/components/Toolbar/Features/Account/ManageableAccountEditModal'
 import { Wallet } from 'app/state/wallet/types'
 
@@ -86,24 +87,25 @@ const StyledDescriptionList = styled.dl`
 export interface AccountSummaryProps {
   address: string
   balance: BalanceDetails
-  editHandler: (name: string) => void
   walletHasAccounts?: boolean
   wallet?: Wallet
 }
 
-export function AccountSummary({
-  address,
-  balance,
-  editHandler,
-  wallet,
-  walletHasAccounts,
-}: AccountSummaryProps) {
+export function AccountSummary({ address, balance, wallet, walletHasAccounts }: AccountSummaryProps) {
   const { t } = useTranslation()
+  const dispatch = useDispatch()
   const [layerVisibility, setLayerVisibility] = useState(false)
   const { dark } = useContext<any>(ThemeContext)
   const isMobile = useContext(ResponsiveContext) === 'small'
   const ticker = useSelector(selectTicker)
-
+  const unlockedStatus = useSelector(selectUnlockedStatus)
+  const unlockedProfile = unlockedStatus === 'unlockedProfile'
+  const editHandler = (name: string) => {
+    if (!wallet) {
+      throw new Error('Wallet not provided')
+    }
+    dispatch(walletActions.setWalletName({ address: wallet.address, name }))
+  }
   return (
     <>
       <Box margin={{ bottom: 'small' }}>
@@ -134,10 +136,12 @@ export function AccountSummary({
       >
         <Box pad="small" direction="row-responsive" flex>
           <Box width={{ max: isMobile ? '100%' : '75%' }}>
-            {wallet?.name ? (
-              <EditableNameBox wallet={wallet} editHandler={() => setLayerVisibility(true)} />
-            ) : (
-              <EditableAddressBox wallet={wallet} editHandler={() => setLayerVisibility(true)} />
+            {!unlockedProfile && <AddressBox address={address} />}
+            {unlockedProfile && !wallet?.name && (
+              <EditableAddressBox wallet={wallet} openEditModal={() => setLayerVisibility(true)} />
+            )}
+            {unlockedProfile && wallet?.name && (
+              <EditableNameBox wallet={wallet} openEditModal={() => setLayerVisibility(true)} />
             )}
             <StyledDescriptionList data-testid="account-balance-summary">
               <dt>
@@ -173,7 +177,7 @@ export function AccountSummary({
           )}
         </Box>
       </Box>
-      {layerVisibility && wallet && (
+      {layerVisibility && wallet && unlockedProfile && (
         <ManageableAccountEditModal
           animation
           closeHandler={() => setLayerVisibility(false)}
