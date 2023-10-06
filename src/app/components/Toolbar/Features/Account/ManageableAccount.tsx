@@ -4,11 +4,13 @@ import { ManageableAccountEditModal } from './ManageableAccountEditModal'
 import { Wallet } from '../../../../state/wallet/types'
 
 export const ManageableAccount = ({
+  closeHandler,
   editHandler,
   wallet,
   isActive,
   onClick,
 }: {
+  closeHandler: () => any
   editHandler?: (name: string) => void
   wallet: Wallet
   isActive: boolean
@@ -32,6 +34,7 @@ export const ManageableAccount = ({
       />
       {layerVisibility && (
         <ManageableAccountEditModal
+          closeParentHandler={closeHandler}
           closeHandler={() => setLayerVisibility(false)}
           editHandler={editHandler}
           wallet={wallet}

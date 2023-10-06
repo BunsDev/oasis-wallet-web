@@ -23,11 +23,13 @@ interface FormValue {
 export const ManageableAccountEditModal = ({
   animation,
   closeHandler,
+  closeParentHandler,
   editHandler,
   wallet,
 }: {
   animation?: boolean
   closeHandler: () => void
+  closeParentHandler?: () => void
   editHandler?: (name: string) => void
   wallet: Wallet
 }) => {
@@ -74,7 +76,7 @@ export const ManageableAccountEditModal = ({
                               <Button
                                 color="link"
                                 onClick={() => {
-                                  closeHandler()
+                                  closeParentHandler ? closeParentHandler() : closeHandler()
                                   navigate('/open-wallet')
                                 }}
                               />
