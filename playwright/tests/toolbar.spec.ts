@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 import { password, privateKey } from '../utils/test-inputs'
-import { fillPrivateKeyAndPassword } from '../utils/fillPrivateKey'
+import { fillPrivateKeyAndPassword, fillPrivateKeyWithoutPassword } from '../utils/fillPrivateKey'
 import { warnSlowApi } from '../utils/warnSlowApi'
 import { mockApi } from '../utils/mockApi'
 
@@ -55,19 +55,33 @@ test.describe('Profile tab', () => {
 })
 
 test.describe('My Accounts tab', () => {
-  test('should get a private key', async ({ page }) => {
-    await page.goto('/open-wallet/private-key')
-    await fillPrivateKeyAndPassword(page)
-    await page.getByTestId('account-selector').click()
-    await page.getByText('Manage').click()
-    await page.getByText('Export Private Key').click()
-    await page.getByText('I understand, reveal my private key').click()
-    await page.getByPlaceholder('Enter your password here').fill('wrong password')
-    await page.getByText('Validate password').click()
-    await expect(page.getByText('Wrong password')).toBeVisible()
-    await page.getByPlaceholder('Enter your password here').fill(password)
-    await page.getByText('Validate password').click()
-    await expect(page.getByText('Wrong password')).not.toBeVisible()
-    await expect(page.getByText(privateKey)).toBeVisible()
+  test.describe('should reveal a private key', () => {
+    test('unpersisted', async ({ page }) => {
+      await page.goto('/open-wallet/private-key')
+      await fillPrivateKeyWithoutPassword(page, {
+        persistenceCheckboxChecked: false,
+        persistenceCheckboxDisabled: false,
+      })
+      await page.getByTestId('account-selector').click()
+      await page.getByText('Manage').click()
+      await page.getByText('Export Private Key').click()
+      await page.getByText('I understand, reveal my private key').click()
+      await expect(page.getByText(privateKey)).toBeVisible()
+    })
+
+    test('persisted', async ({ page }) => {
+      await page.goto('/open-wallet/private-key')
+      await fillPrivateKeyAndPassword(page)
+      await page.getByTestId('account-selector').click()
+      await page.getByText('Manage').click()
+      await page.getByText('Export Private Key').click()
+      await page.getByPlaceholder('Enter your password here').fill('wrong password')
+      await page.getByText('I understand, reveal my private key').click()
+      await expect(page.getByText('Wrong password')).toBeVisible()
+      await page.getByPlaceholder('Enter your password here').fill(password)
+      await page.getByText('I understand, reveal my private key').click()
+      await expect(page.getByText('Wrong password')).not.toBeVisible()
+      await expect(page.getByText(privateKey)).toBeVisible()
+    })
   })
 })

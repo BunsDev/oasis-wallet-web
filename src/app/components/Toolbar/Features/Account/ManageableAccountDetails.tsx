@@ -15,6 +15,7 @@ import { NoTranslate } from 'app/components/NoTranslate'
 import { PasswordField } from 'app/components/PasswordField'
 import { persistActions } from 'app/state/persist'
 import { selectEnteredWrongPassword, selectPasswordCheckPass } from 'app/state/persist/selectors'
+import { selectUnlockedStatus } from 'app/state/selectUnlockedStatus'
 import { preventSavingInputsToUserData } from 'app/lib/preventSavingInputsToUserData'
 import { Wallet } from '../../../../state/wallet/types'
 import { DerivationFormatter } from './DerivationFormatter'
@@ -32,6 +33,8 @@ export const ManageableAccountDetails = ({ wallet }: ManageableAccountDetailsPro
   const dispatch = useDispatch()
   const enteredWrongPassword = useSelector(selectEnteredWrongPassword)
   const passwordCheckPass = useSelector(selectPasswordCheckPass)
+  const unlockedStatus = useSelector(selectUnlockedStatus)
+  const needsPasswordVerification = unlockedStatus === 'unlockedProfile'
   const [layerVisibility, setLayerVisibility] = useState(false)
   const [password, setPassword] = useState('')
   const [acknowledge, setAcknowledge] = useState(false)
@@ -44,13 +47,17 @@ export const ManageableAccountDetails = ({ wallet }: ManageableAccountDetailsPro
     }
   }
   const hideLayer = () => {
-    dispatch(persistActions.resetPasswordCheckPass())
-    dispatch(persistActions.resetWrongPassword())
+    if (needsPasswordVerification) {
+      dispatch(persistActions.resetPasswordCheckPass())
+      dispatch(persistActions.resetWrongPassword())
+    } else {
+      setAcknowledge(false)
+    }
     setPassword('')
-    setAcknowledge(false)
     setLayerVisibility(false)
   }
   const onSubmit = () => dispatch(persistActions.checkPasswordAsync({ currentPassword: password }))
+
   return (
     <>
       <Box>
@@ -76,71 +83,80 @@ export const ManageableAccountDetails = ({ wallet }: ManageableAccountDetailsPro
                 pad={{ vertical: 'medium' }}
               >
                 <Box gap="medium">
-                  <Text>
-                    {t(
-                      'toolbar.settings.exportPrivateKey.hint1',
-                      'The private key consists of a string of characters, and owning the private key is equivalent to owning the asset ownership.',
-                    )}
-                  </Text>
-                  <Text>
-                    {t(
-                      'toolbar.settings.exportPrivateKey.hint2',
-                      'Once the private key is lost, it cannot be retrieved. Please make sure to Backup the private key and keep it in a safe place.',
-                    )}
-                  </Text>
-                </Box>
-                {!acknowledge && !passwordCheckPass && (
-                  <Button
-                    alignSelf="center"
-                    primary
-                    label={t(
-                      'toolbar.settings.exportPrivateKey.confirm',
-                      'I understand, reveal my private key',
-                    )}
-                    onClick={() => setAcknowledge(true)}
-                  />
-                )}
-
-                {acknowledge && !passwordCheckPass && (
-                  <Form onSubmit={onSubmit} {...preventSavingInputsToUserData}>
-                    <PasswordField
-                      placeholder={t('persist.loginToProfile.enterPasswordHere', 'Enter your password here')}
-                      name="password"
-                      inputElementId="password"
-                      autoFocus
-                      value={password}
-                      onChange={event => setPassword(event.target.value)}
-                      error={
-                        enteredWrongPassword
-                          ? t('persist.loginToProfile.wrongPassword', 'Wrong password')
-                          : false
-                      }
-                      showTip={t('persist.loginToProfile.showPassword', 'Show password')}
-                      hideTip={t('persist.loginToProfile.hidePassword', 'Hide password')}
-                      width="auto"
+                  <Box gap="medium">
+                    <Text>
+                      {t(
+                        'toolbar.settings.exportPrivateKey.hint1',
+                        'The private key consists of a string of characters. Anyone with access to your private key has direct access to the assets of that account.',
+                      )}
+                    </Text>
+                    <Text>
+                      {t(
+                        'toolbar.settings.exportPrivateKey.hint2',
+                        'Once the private key is lost, it cannot be retrieved. Please make sure to Backup the private key and keep it in a safe place.',
+                      )}
+                    </Text>
+                  </Box>
+                  {!needsPasswordVerification && !acknowledge && (
+                    <Button
+                      alignSelf="center"
+                      primary
+                      label={t(
+                        'toolbar.settings.exportPrivateKey.confirm',
+                        'I understand, reveal my private key',
+                      )}
+                      onClick={() => setAcknowledge(true)}
                     />
-                    <Box direction="row" justify="end" margin={{ top: 'medium' }}>
+                  )}
+
+                  {needsPasswordVerification && !passwordCheckPass && (
+                    <Form onSubmit={onSubmit} {...preventSavingInputsToUserData}>
+                      <PasswordField
+                        placeholder={t(
+                          'persist.loginToProfile.enterPasswordHere',
+                          'Enter your password here',
+                        )}
+                        name="password"
+                        inputElementId="password"
+                        autoFocus
+                        value={password}
+                        onChange={event => setPassword(event.target.value)}
+                        error={
+                          enteredWrongPassword
+                            ? t('persist.loginToProfile.wrongPassword', 'Wrong password')
+                            : false
+                        }
+                        showTip={t('persist.loginToProfile.showPassword', 'Show password')}
+                        hideTip={t('persist.loginToProfile.hidePassword', 'Hide password')}
+                        width="auto"
+                      />
+                      <Box direction="row" justify="end" margin={{ top: 'medium' }}>
+                        <Button
+                          primary
+                          type="submit"
+                          label={t(
+                            'toolbar.settings.exportPrivateKey.confirm',
+                            'I understand, reveal my private key',
+                          )}
+                        />
+                      </Box>
+                    </Form>
+                  )}
+
+                  {((!needsPasswordVerification && acknowledge) ||
+                    (needsPasswordVerification && passwordCheckPass)) && (
+                    <Box direction="row" gap="small">
+                      <Box round="5px" border={{ color: 'brand' }} pad="small" style={{ display: 'block' }}>
+                        <NoTranslate>{uintToBase64(hex2uint(wallet.privateKey!))}</NoTranslate>
+                      </Box>
                       <Button
-                        primary
-                        type="submit"
-                        label={t('toolbar.settings.exportPrivateKey.validate', 'Validate password')}
+                        onClick={() => copyAddress()}
+                        icon={<Copy size="18px" />}
+                        data-testid="copy-address"
                       />
                     </Box>
-                  </Form>
-                )}
-
-                {acknowledge && passwordCheckPass && (
-                  <Box direction="row" gap="small">
-                    <Box round="5px" border={{ color: 'brand' }} pad="small" style={{ display: 'block' }}>
-                      <NoTranslate>{uintToBase64(hex2uint(wallet.privateKey!))}</NoTranslate>
-                    </Box>
-                    <Button
-                      onClick={() => copyAddress()}
-                      icon={<Copy size="18px" />}
-                      data-testid="copy-address"
-                    />
-                  </Box>
-                )}
+                  )}
+                </Box>
                 <Box direction="row" justify="between" pad={{ top: 'large' }}>
                   <Button secondary label={t('toolbar.settings.cancel', 'Cancel')} onClick={hideLayer} />
                 </Box>
