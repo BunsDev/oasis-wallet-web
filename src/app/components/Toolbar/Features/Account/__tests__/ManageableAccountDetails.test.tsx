@@ -42,16 +42,23 @@ describe('<ManageableAccountDetails  />', () => {
     const spy = jest.spyOn(store, 'dispatch')
     renderComponent(store)
 
+    expect(spy).toHaveBeenNthCalledWith(1, {
+      type: persistActions.resetPasswordCheckPass.type,
+    })
+    expect(spy).toHaveBeenNthCalledWith(2, {
+      type: persistActions.resetWrongPassword.type,
+    })
+
     await userEvent.click(screen.getByRole('button', { name: 'toolbar.settings.exportPrivateKey.title' }))
     expect(screen.getByText('toolbar.settings.exportPrivateKey.hint1')).toBeInTheDocument()
     expect(screen.getByText('toolbar.settings.exportPrivateKey.hint2')).toBeInTheDocument()
     expect(screen.getByPlaceholderText('persist.loginToProfile.enterPasswordHere')).toBeInTheDocument()
     await userEvent.click(screen.getByRole('button', { name: 'toolbar.settings.cancel' }))
 
-    expect(spy).toHaveBeenCalledWith({
+    expect(spy).toHaveBeenNthCalledWith(3, {
       type: persistActions.resetPasswordCheckPass.type,
     })
-    expect(spy).toHaveBeenCalledWith({
+    expect(spy).toHaveBeenNthCalledWith(4, {
       type: persistActions.resetWrongPassword.type,
     })
   })

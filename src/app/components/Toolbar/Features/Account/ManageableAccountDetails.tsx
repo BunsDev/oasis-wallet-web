@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import copy from 'copy-to-clipboard'
 import { Box } from 'grommet/es6/components/Box'
@@ -57,6 +57,10 @@ export const ManageableAccountDetails = ({ wallet }: ManageableAccountDetailsPro
     setLayerVisibility(false)
   }
   const onSubmit = () => dispatch(persistActions.checkPasswordAsync({ currentPassword: password }))
+  useEffect(() => {
+    dispatch(persistActions.resetPasswordCheckPass())
+    dispatch(persistActions.resetWrongPassword())
+  }, [dispatch])
 
   return (
     <>
